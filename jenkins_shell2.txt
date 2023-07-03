@@ -1,0 +1,20 @@
+#!/bin/bash
+
+BUILD_NUMBER="";
+STATUS="None";
+COMPLETE="false";
+
+function isJenkinsJobComplete() {
+    API_RESPONSE=`curl ${1}`;
+    STATUS=`echo "${API_RESPONSE}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]'`;
+    BUILD_NUMBER=`echo "${API_RESPONSE}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["id"]'`;
+
+    if [ ${STATUS} != "None" ]; then
+        COMPLETE='true';
+    else
+        COMPLETE='false';
+    fi
+}
+
+isJenkinsJobComplete "https://myhost/myjob/lastBuild/api/json"
+echo "Build #${BUILD_NUMBER} is complete: ${COMPLETE}, status is: ${STATUS}";
